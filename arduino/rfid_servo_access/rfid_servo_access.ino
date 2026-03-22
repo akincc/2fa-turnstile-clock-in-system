@@ -54,8 +54,10 @@ String readUID() {
   return uid;
 }
 
-void accessGranted() {
-  Serial.println("ACCESS GRANTED");
+void accessGranted(String uid) {
+  Serial.print("UID:");
+  Serial.print(uid);
+  Serial.println(",STATUS:GRANTED");
 
   myServo.write(90);
   digitalWrite(GRANTED_LED, HIGH);
@@ -68,8 +70,10 @@ void accessGranted() {
   myServo.write(0);
 }
 
-void accessDenied() {
-  Serial.println("ACCESS DENIED");
+void accessDenied(String uid) {
+  Serial.print("UID:");
+  Serial.print(uid);
+  Serial.println(",STATUS:DENIED");
 
   digitalWrite(DENIED_LED, HIGH);
   beep(600, 0, 1);
@@ -85,12 +89,11 @@ void loop() {
   if (!rfid.PICC_ReadCardSerial()) return;
 
   String uid = readUID();
-  Serial.println(uid);
 
   if (isAuthorized(uid)) {
-    accessGranted();
+    accessGranted(uid);
   } else {
-    accessDenied();
+    accessDenied(uid);
   }
 
   rfid.PICC_HaltA();
