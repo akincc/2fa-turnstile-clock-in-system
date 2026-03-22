@@ -1,7 +1,7 @@
 import serial
 from config import SERIAL_PORT, BAUD_RATE
 from utils import parse_line
-from db import insert_log
+from db import insert_log, get_user_name
 
 
 def start_serial_listener():
@@ -21,6 +21,8 @@ def start_serial_listener():
 
         if uid and status:
             insert_log(uid, status)
-            print(f"Record inserted -> UID: {uid}, STATUS: {status}")
+            name = get_user_name(uid)
+
+            print(f"Record inserted -> Name: {name}, UID: {uid}, STATUS: {status}")
         else:
             print("Format not recognized:", line)

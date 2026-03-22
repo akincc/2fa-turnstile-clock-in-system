@@ -7,9 +7,17 @@ def get_connection():
     return sqlite3.connect(DB_NAME)
 
 
-def create_table():
+def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL
+    )
+    """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS access_logs (
@@ -22,6 +30,36 @@ def create_table():
 
     conn.commit()
     conn.close()
+
+
+def insert_user(uid, name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT OR IGNORE INTO users (uid, name)
+    VALUES (?, ?)
+    """, (uid, name))
+
+    conn.commit()
+    conn.close()
+
+
+def get_user_name(uid):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT name FROM users
+    WHERE uid = ?
+    """, (uid,))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return row[0]
+    return "Unknown"
 
 
 def insert_log(uid, status):
@@ -38,14 +76,16 @@ def insert_log(uid, status):
     conn.commit()
     conn.close()
 
+
 def read_logs():
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT id, uid, status, created_at
+    SELECT access_logs.id, access_logs.uid, users.name, access_logs.status, access_logs.created_at
     FROM access_logs
-    ORDER BY id DESC
+    LEFT JOIN users ON access_logs.uid = users.uid
+    ORDER BY access_logs.id DESC
     """)
 
     rows = cursor.fetchall()

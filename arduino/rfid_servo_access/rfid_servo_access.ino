@@ -12,7 +12,11 @@
 MFRC522 rfid(SS_PIN, RST_PIN);
 Servo myServo;
 
-String allowedUID = "FDD812FC";
+String allowedUIDs[] = {
+  "FDD812FC",
+  "4B2D74CF6180",
+  "2958DF8E"
+};
 
 void setup() {
   Serial.begin(9600);
@@ -81,7 +85,14 @@ void accessDenied(String uid) {
 }
 
 bool isAuthorized(String uid) {
-  return uid == allowedUID;
+  int count = sizeof(allowedUIDs) / sizeof(allowedUIDs[0]);
+
+  for (int i = 0; i < count; i++) {
+    if (uid == allowedUIDs[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void loop() {
