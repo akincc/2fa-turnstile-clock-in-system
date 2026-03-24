@@ -11,13 +11,14 @@ The long-term goal is to create a two-factor authentication system using RFID an
 - Green LED for granted access
 - Red LED for denied access
 - Buzzer feedback for different access results
+- Python serial communication
+- SQLite database integration
+- Clock-in / clock-out logging
+- Visualised access logs using Flask
 
 ![21 March 2026 - Prototype](images/rfid_servo_access.gif)
 
 ## Planned Features
-- Python serial communication (done)
-- SQLite database integration
-- Clock-in / clock-out logging
 - Face recognition as second factor
 - Admin panel / reporting interface
 
