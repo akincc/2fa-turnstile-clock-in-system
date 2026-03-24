@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-from config import DB_NAME
+from config import DB_NAME, allowed_uids
 
 
 def get_connection():
@@ -23,6 +23,7 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS access_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         uid TEXT NOT NULL,
+        name TEXT NOT NULL,
         status TEXT NOT NULL,
         created_at TEXT NOT NULL
     )
@@ -33,16 +34,16 @@ def create_tables():
 
 
 def insert_user(uid, name):
-    conn = get_connection()
-    cursor = conn.cursor()
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("""
-    INSERT OR IGNORE INTO users (uid, name)
-    VALUES (?, ?)
-    """, (uid, name))
+        cursor.execute("""
+        INSERT OR IGNORE INTO users (uid, name)
+        VALUES (?, ?)
+        """, (uid, name))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
 
 def get_user_name(uid):
@@ -69,9 +70,9 @@ def insert_log(uid, status):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     cursor.execute("""
-    INSERT INTO access_logs (uid, status, created_at)
-    VALUES (?, ?, ?)
-    """, (uid, status, created_at))
+    INSERT INTO access_logs (uid, name, status, created_at)
+    VALUES (?, ?, ?, ?)
+    """, (uid, get_user_name(uid),  status, created_at))
 
     conn.commit()
     conn.close()
@@ -82,9 +83,8 @@ def read_logs():
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT access_logs.id, access_logs.uid, users.name, access_logs.status, access_logs.created_at
+    SELECT access_logs.id, access_logs.uid, access_logs.name, access_logs.status, access_logs.created_at
     FROM access_logs
-    LEFT JOIN users ON access_logs.uid = users.uid
     ORDER BY access_logs.id DESC
     """)
 

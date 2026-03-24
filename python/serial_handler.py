@@ -1,28 +1,29 @@
 import serial
 from config import SERIAL_PORT, BAUD_RATE
-from utils import parse_line
 from db import insert_log, get_user_name
 
+def is_authorized(uid):
+    if uid in get_user_name(uid):
+        serial.write(b"GRANTED")
+        insert_log(uid, "GRANTED")
+    else:
+        serial.write(b"DENIED")
+        insert_log(uid, "DENIED")
 
-def start_serial_listener():
+def serial_listener():
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 
     print("Ready to read from serial port...")
 
     while True:
-        line = ser.readline().decode("utf-8").strip()
+        uid_received = ser.readline().decode("utf-8").strip()
 
-        if not line:
+        if not uid_received:
             continue
 
-        print("Data received:", line)
-
-        uid, status = parse_line(line)
-
-        if uid and status:
-            insert_log(uid, status)
-            name = get_user_name(uid)
-
-            print(f"Record inserted -> Name: {name}, UID: {uid}, STATUS: {status}")
+        if get_user_name(uid_received) == "Unknown":
+            ser.write("DENIED\n".encode())
+            insert_log(uid_received, "DENIED")
         else:
-            print("Format not recognized:", line)
+            ser.write("GRANTED\n".encode())
+            insert_log(uid_received, "GRANTED")

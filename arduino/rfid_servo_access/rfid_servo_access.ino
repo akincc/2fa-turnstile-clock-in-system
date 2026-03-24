@@ -12,12 +12,6 @@
 MFRC522 rfid(SS_PIN, RST_PIN);
 Servo myServo;
 
-String allowedUIDs[] = {
-  "FDD812FC",
-  "4B2D74CF6180",
-  "2958DF8E"
-};
-
 void setup() {
   Serial.begin(9600);
   SPI.begin();
@@ -58,41 +52,28 @@ String readUID() {
   return uid;
 }
 
-void accessGranted(String uid) {
-  Serial.print("UID:");
-  Serial.print(uid);
-  Serial.println(",STATUS:GRANTED");
+String serialResponse() {
+  if (Serial.available() > 0) {
+    String response = Serial.readStringUntil('\n');
+    response.trim();
+    return response;
+  }
+  return "";
+}
 
+void accessGranted() {
   myServo.write(90);
   digitalWrite(GRANTED_LED, HIGH);
-
   beep(100, 100, 2);
-
   delay(2000);
-
   digitalWrite(GRANTED_LED, LOW);
   myServo.write(0);
 }
 
-void accessDenied(String uid) {
-  Serial.print("UID:");
-  Serial.print(uid);
-  Serial.println(",STATUS:DENIED");
-
+void accessDenied() {
   digitalWrite(DENIED_LED, HIGH);
   beep(600, 0, 1);
   digitalWrite(DENIED_LED, LOW);
-}
-
-bool isAuthorized(String uid) {
-  int count = sizeof(allowedUIDs) / sizeof(allowedUIDs[0]);
-
-  for (int i = 0; i < count; i++) {
-    if (uid == allowedUIDs[i]) {
-      return true;
-    }
-  }
-  return false;
 }
 
 void loop() {
@@ -101,10 +82,17 @@ void loop() {
 
   String uid = readUID();
 
-  if (isAuthorized(uid)) {
-    accessGranted(uid);
+  Serial.println(uid);
+
+  delay(1000);
+
+  String response = serialResponse();
+  if (response == "GRANTED") {
+    accessGranted();
+  } else if (response == "DENIED") {
+    accessDenied();
   } else {
-    accessDenied(uid);
+    Serial.println("No valid response received");
   }
 
   rfid.PICC_HaltA();
