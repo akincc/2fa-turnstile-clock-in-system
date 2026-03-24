@@ -2,14 +2,6 @@ import serial
 from config import SERIAL_PORT, BAUD_RATE
 from db import insert_log, get_user_name
 
-def is_authorized(uid):
-    if uid in get_user_name(uid):
-        serial.write(b"GRANTED")
-        insert_log(uid, "GRANTED")
-    else:
-        serial.write(b"DENIED")
-        insert_log(uid, "DENIED")
-
 def serial_listener():
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 
