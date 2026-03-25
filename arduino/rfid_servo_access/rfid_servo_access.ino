@@ -80,7 +80,9 @@ bool waitingForResponse = false;
 void loop() {
   if (waitingForResponse) {
     if (Serial.available()) {
-      String response = Serial.readStringUntil('\n').trim();
+      String response = Serial.readStringUntil('\n');
+      response.trim();
+
       if (response == "GRANTED") {
         accessGranted();
       } else if (response == "DENIED") {
