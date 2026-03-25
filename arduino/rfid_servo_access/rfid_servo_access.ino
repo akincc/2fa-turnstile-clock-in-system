@@ -76,7 +76,22 @@ void accessDenied() {
   digitalWrite(DENIED_LED, LOW);
 }
 
+bool waitingForResponse = false;
 void loop() {
+  if (waitingForResponse) {
+    if (Serial.available()) {
+      String response = Serial.readStringUntil('\n').trim();
+      if (response == "GRANTED") {
+        accessGranted();
+      } else if (response == "DENIED") {
+        accessDenied();
+      }
+
+      waitingForResponse = false;
+    }
+  return;
+}
+
   if (!rfid.PICC_IsNewCardPresent()) return;
   if (!rfid.PICC_ReadCardSerial()) return;
 
@@ -84,17 +99,7 @@ void loop() {
 
   Serial.println(uid);
 
-  delay(1000);
-
-  String response = serialResponse();
-  if (response == "GRANTED") {
-    accessGranted();
-  } else if (response == "DENIED") {
-    accessDenied();
-  } else {
-    Serial.println("No valid response received");
-  }
+  waitingForResponse = true;
 
   rfid.PICC_HaltA();
-  delay(300);
 }
