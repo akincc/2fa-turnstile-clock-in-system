@@ -2,7 +2,7 @@
 
 
 # Update these values based on your setup
-SERIAL_PORT = "/dev/cu.usbmodem1101"
+SERIAL_PORT = "/dev/cu.usbmodem11101"
 BAUD_RATE = 9600
 
 # Database configuration
