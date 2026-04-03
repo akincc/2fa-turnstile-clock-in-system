@@ -108,8 +108,9 @@ while True:
                 elif key == ord("c"):
                     reference_embedding = None
                     print("Reference cleared")
-                    cv2.destroyWindow("Reference Face")
-                    cv2.destroyWindow("Face Crop")
+                    empty_img = np.zeros((160, 160, 3), dtype=np.uint8)
+                    cv2.imshow("Reference Face", empty_img)
+                    cv2.imshow("Face Crop", empty_img)
 
                 if reference_embedding is None:
                     continue
