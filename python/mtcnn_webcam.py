@@ -52,6 +52,10 @@ def get_embedding(face_img):
  
 reference_embedding = None
 
+def show_window(window_name, content, x, y):
+    cv2.imshow(window_name, content)
+    cv2.moveWindow(window_name, x, y)
+
 while True:
     key = cv2.waitKey(1) & 0xFF
     ret, frame = cap.read()
@@ -104,13 +108,13 @@ while True:
                 if key == ord("s"):
                     reference_embedding = current_embedding
                     print("Reference saved")
-                    cv2.imshow("Reference Face", face_crop)
+                    show_window("Reference Face", face_crop, 720, 290)
                 elif key == ord("c"):
                     reference_embedding = None
                     print("Reference cleared")
                     empty_img = np.zeros((160, 160, 3), dtype=np.uint8)
-                    cv2.imshow("Reference Face", empty_img)
-                    cv2.imshow("Face Crop", empty_img)
+                    show_window("Reference Face", empty_img, 720, 290)
+                    show_window("Face Crop", empty_img, 720, 0)
 
                 if reference_embedding is None:
                     continue
@@ -127,15 +131,15 @@ while True:
                         cv2.putText(display, f"NO MATCH - Distance: {distance:.4f}", (x1, y2 + 30),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
             if face_crop.size > 0:
-                face_crop_to_show = face_crop
+                face_crop_to_show = cv2.resize(face_crop, (160, 160))
 
             # for now, we only show the first detected face crop
             break
 
-    cv2.imshow("Webcam - MTCNN Detection", display)
+    show_window("Webcam - MTCNN Detection", display, 0, 0)
 
     if face_crop_to_show is not None:
-        cv2.imshow("Face Crop", face_crop_to_show)
+        show_window("Face Crop", face_crop_to_show, 720, 0)
 
     if key == ord("q"):
         break
