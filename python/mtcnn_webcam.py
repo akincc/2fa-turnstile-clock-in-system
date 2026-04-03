@@ -1,10 +1,12 @@
 import cv2
 import torch
 import numpy as np
-from facenet_pytorch import MTCNN
+from facenet_pytorch import MTCNN, InceptionResnetV1
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
+
+resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 mtcnn = MTCNN(
     image_size=160,
@@ -15,6 +17,7 @@ mtcnn = MTCNN(
     post_process=False,
     device=device
 )
+
 
 cap = cv2.VideoCapture(
     "/dev/v4l/by-id/usb-046d_C922_Pro_Stream_Webcam_5FBE37BF-video-index0",
@@ -36,7 +39,21 @@ frame_count = 0
 boxes = None
 probs = None
 
+def get_embedding(face_img):
+    face = cv2.resize(face_img, (160, 160))
+    face = face.astype(np.float32) / 255.0
+
+    face = torch.from_numpy(face).float().permute(2, 0, 1).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        embedding = resnet(face)
+
+    return embedding
+ 
+reference_embedding = None
+
 while True:
+    key = cv2.waitKey(1) & 0xFF
     ret, frame = cap.read()
     if not ret:
         print("Cannot read frame from webcam.")
@@ -81,6 +98,34 @@ while True:
 
             face_crop = frame[y1:y2, x1:x2]
             if face_crop.size > 0:
+                face_crop_rgb = cv2.cvtColor(face_crop, cv2.COLOR_BGR2RGB)
+                current_embedding = get_embedding(face_crop_rgb)
+                
+                if key == ord("s"):
+                    reference_embedding = current_embedding
+                    print("Reference saved")
+                    cv2.imshow("Reference Face", face_crop)
+                elif key == ord("c"):
+                    reference_embedding = None
+                    print("Reference cleared")
+                    cv2.destroyWindow("Reference Face")
+                    cv2.destroyWindow("Face Crop")
+
+                if reference_embedding is None:
+                    continue
+
+                else:
+                    distance = torch.norm(reference_embedding - current_embedding).item()
+
+                    #print(f"Distance: {distance:.4f}")
+
+                    if distance < 0.8:
+                        cv2.putText(display, f"MATCH - Distance: {distance:.4f}", (x1, y2 + 30),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
+                    else:
+                        cv2.putText(display, f"NO MATCH - Distance: {distance:.4f}", (x1, y2 + 30),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
+            if face_crop.size > 0:
                 face_crop_to_show = face_crop
 
             # for now, we only show the first detected face crop
@@ -91,7 +136,6 @@ while True:
     if face_crop_to_show is not None:
         cv2.imshow("Face Crop", face_crop_to_show)
 
-    key = cv2.waitKey(1) & 0xFF
     if key == ord("q"):
         break
 
