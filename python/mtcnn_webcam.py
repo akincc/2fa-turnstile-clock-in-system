@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from facenet_pytorch import MTCNN
 
-device = torch.device("cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 mtcnn = MTCNN(
@@ -16,7 +16,10 @@ mtcnn = MTCNN(
     device=device
 )
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(
+    "/dev/v4l/by-id/usb-046d_C922_Pro_Stream_Webcam_5FBE37BF-video-index0",
+    cv2.CAP_V4L2
+)
 
 # open the second webcam if the first one is not available
 if not cap.isOpened():
