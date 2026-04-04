@@ -8,7 +8,11 @@ ports = serial.tools.list_ports.comports()
 for port in ports:
     print(port.device, port.description)
 
+    # For Ubuntu
     if "Arduino" in port.description:
+        arduino_port = port.device
+    # For MacOS
+    elif "IOUSBHostDevice" in port.description:
         arduino_port = port.device
 
 print("Selected:", arduino_port)
