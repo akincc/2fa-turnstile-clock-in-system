@@ -5,18 +5,17 @@ from db import insert_log, get_user_name
 
 ports = serial.tools.list_ports.comports()
 
-for port in ports:
+# Default to the port specified in config.py for Ubuntu
+arduino_port = SERIAL_PORT_ubuntu
 
-    # For MacOS
+# For MacOS
+for port in ports:
     if "IOUSBHostDevice" in port.description:
         arduino_port = port.device
         print("Port has been selected automatically for MacOS:", arduino_port)
-        break
-    # For Ubuntu (because the description is n/a on Ubuntu)
-    else:
-        arduino_port = SERIAL_PORT_ubuntu
-        print("Port has been imported from config.py for Ubuntu:", arduino_port)
-        break
+
+if arduino_port == SERIAL_PORT_ubuntu:
+    print("Port has been imported from config.py for Ubuntu:", arduino_port)
 
 def serial_listener():
     ser = serial.Serial(arduino_port, BAUD_RATE, timeout=1)
