@@ -1,8 +1,8 @@
 # Configuration file for the turnstile clock-in system
 
 
-# Update these values based on your setup
-#SERIAL_PORT_ubuntu = "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55930343636351A0E0B1-if00" //for future reference: this is for ubuntu
+# This is for Ubuntu. For MacOS, the serial port is detected automatically in serial_handler.py
+SERIAL_PORT_ubuntu = "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55930343636351A0E0B1-if00"
 BAUD_RATE = 9600
 
 # Database configuration
