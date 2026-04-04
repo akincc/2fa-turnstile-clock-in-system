@@ -1,9 +1,20 @@
 import serial
-from config import SERIAL_PORT, BAUD_RATE
+import serial.tools.list_ports
+from config import BAUD_RATE
 from db import insert_log, get_user_name
 
+ports = serial.tools.list_ports.comports()
+
+for port in ports:
+    print(port.device, port.description)
+
+    if "Arduino" in port.description:
+        arduino_port = port.device
+
+print("Selected:", arduino_port)
+
 def serial_listener():
-    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    ser = serial.Serial(arduino_port, BAUD_RATE, timeout=1)
 
     print("Ready to read from serial port...")
 

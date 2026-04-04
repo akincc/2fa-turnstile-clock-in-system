@@ -2,7 +2,7 @@
 
 
 # Update these values based on your setup
-SERIAL_PORT = "/dev/cu.usbmodem11101"
+#SERIAL_PORT_ubuntu = "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55930343636351A0E0B1-if00" //for future reference: this is for ubuntu
 BAUD_RATE = 9600
 
 # Database configuration
