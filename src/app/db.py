@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-from config import DB_NAME, allowed_uids
+from src.app.config import DB_NAME, allowed_uids
 
 
 def get_connection():

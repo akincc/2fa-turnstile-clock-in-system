@@ -1,7 +1,7 @@
 from flask import Flask, render_template
-from db import read_logs
+from src.app.db import read_logs
 
-app = Flask(__name__, template_folder="../docs")
+app = Flask(__name__, template_folder="../templates")
 
 
 @app.route("/")

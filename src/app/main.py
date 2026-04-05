@@ -1,6 +1,6 @@
-from db import create_tables, insert_user
-from serial_handler import serial_listener
-from config import allowed_uids
+from src.app.db import create_tables, insert_user
+from src.app.serial_handler import serial_listener
+from src.app.config import allowed_uids
 
 
 def main():

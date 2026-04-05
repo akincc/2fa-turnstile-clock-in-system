@@ -1,7 +1,7 @@
 import serial
 import serial.tools.list_ports
-from config import BAUD_RATE, SERIAL_PORT_ubuntu
-from db import insert_log, get_user_name
+from src.app.config import BAUD_RATE, SERIAL_PORT_ubuntu
+from src.app.db import insert_log, get_user_name
 
 ports = serial.tools.list_ports.comports()
 
